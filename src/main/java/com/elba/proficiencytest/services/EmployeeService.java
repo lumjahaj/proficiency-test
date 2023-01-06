@@ -1,7 +1,9 @@
 package com.elba.proficiencytest.services;
 
 import com.elba.proficiencytest.dtos.EmployeeRowDTO;
+import com.elba.proficiencytest.dtos.EmployeesByStatusDTO;
 import com.elba.proficiencytest.dtos.ExcelDataDTO;
+import com.elba.proficiencytest.dtos.ViewEmployeeDTO;
 import com.elba.proficiencytest.entities.Department;
 import com.elba.proficiencytest.entities.Employee;
 import com.elba.proficiencytest.entities.Address;
@@ -35,6 +37,43 @@ public class EmployeeService {
         this.employeeRepository = employeeRepository;
         this.departmentRepository = departmentRepository;
         this.addressRepository = addressRepository;
+    }
+
+    public ResponseEntity<List<ViewEmployeeDTO>> searchEmployees(String search) {
+
+        List<ViewEmployeeDTO> viewEmployeeDTOS;
+
+        try {
+            search = search.toLowerCase();
+            viewEmployeeDTOS = employeeRepository.findAllBySearch(search);
+        } catch (Exception e) {
+            System.out.println("Exception occurred during find employees by search");
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(viewEmployeeDTOS, HttpStatus.OK);
+    }
+
+    public ResponseEntity<EmployeesByStatusDTO> getEmployeesByStatus() {
+        EmployeesByStatusDTO employeesByStatusDTOS;
+
+        List<ViewEmployeeDTO> viewActiveEmployeeDTOS;
+        List<ViewEmployeeDTO> viewInactiveEmployeeDTOS;
+
+        try {
+            viewActiveEmployeeDTOS = employeeRepository.findAllByStatusIsActive();
+            viewInactiveEmployeeDTOS = employeeRepository.findAllByStatusIsInactive();
+
+            employeesByStatusDTOS = new EmployeesByStatusDTO(viewActiveEmployeeDTOS, viewInactiveEmployeeDTOS);
+
+        } catch (Exception e) {
+            System.out.println("Exception occurred during find employees by status");
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(employeesByStatusDTOS, HttpStatus.OK);
     }
 
     public ResponseEntity<?> uploadDataFromFile(MultipartFile multipartFile) {
@@ -132,12 +171,10 @@ public class EmployeeService {
         else
             employee.setStatus(Status.ACTIVE);
 
-
         Address address = new Address();
         address.setCity(excelRow.getAddress().split(",")[0]);
         address.setNeighborhood(excelRow.getAddress().split(",")[1]);
         employee.setAddress(addressRepository.save(address));
-//        employee.setAddress(address);
 
         employeeRepository.save(employee);
     }
