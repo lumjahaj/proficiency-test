@@ -11,4 +11,8 @@ public class DateUtil {
         return LocalDate.parse(String.valueOf(date), dateFormatter);
     }
 
+    public static String localDateToString(LocalDate date) {
+        return date != null ? date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) : null;
+    }
+
 }
