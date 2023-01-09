@@ -1,0 +1,145 @@
+{
+	"info": {
+		"_postman_id": "880684b4-03cd-428b-a38f-6087e7eab3d7",
+		"name": "proficiency-test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7324118"
+	},
+	"item": [
+		{
+			"name": "employees",
+			"item": [
+				{
+					"name": "Get All Employees By Search",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/employees?search=",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"employees"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employees By Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/employees/status",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"employees",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employees In Ascending Order",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/employees/ascending",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"employees",
+								"ascending"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "departments",
+			"item": [
+				{
+					"name": "Get All Departments Employees",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/departments/employees",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"departments",
+								"employees"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Upload Excel",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/Lum Jahaj/Downloads/employees.xlsx"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/employees/upload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"employees",
+						"upload"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
