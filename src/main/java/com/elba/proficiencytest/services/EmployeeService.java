@@ -1,9 +1,6 @@
 package com.elba.proficiencytest.services;
 
-import com.elba.proficiencytest.dtos.EmployeeRowDTO;
-import com.elba.proficiencytest.dtos.EmployeesByStatusDTO;
-import com.elba.proficiencytest.dtos.ExcelDataDTO;
-import com.elba.proficiencytest.dtos.ViewEmployeeDTO;
+import com.elba.proficiencytest.dtos.*;
 import com.elba.proficiencytest.entities.Department;
 import com.elba.proficiencytest.entities.Employee;
 import com.elba.proficiencytest.entities.Address;
@@ -76,6 +73,21 @@ public class EmployeeService {
         return new ResponseEntity<>(employeesByStatusDTOS, HttpStatus.OK);
     }
 
+    public ResponseEntity<List<ViewEmployeeDTO>> getEmployeesInAscendingOrder() {
+
+        List<ViewEmployeeDTO> viewEmployeeDTOS;
+
+        try {
+            viewEmployeeDTOS = employeeRepository.findAllOrderByFirstNameAsc();
+        } catch (Exception e) {
+            System.out.println("Exception occurred during find employees in ascending order");
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(viewEmployeeDTOS, HttpStatus.OK);
+    }
+
     public ResponseEntity<?> uploadDataFromFile(MultipartFile multipartFile) {
 
         File file = new File("src/main/resources/employees.xlsx");
@@ -103,9 +115,9 @@ public class EmployeeService {
             for (ExcelDataDTO excelRow : excelData) {
 
                 //if date format in Excel file 'start date' or 'end date' is not valid don't create employee
-                try{
+                try {
                     createEmployee(excelRow);
-                }catch (DateTimeParseException e) {
+                } catch (DateTimeParseException e) {
                     continue;
                 }
 
@@ -132,8 +144,14 @@ public class EmployeeService {
                     Optional<Employee> manager = employeeRepository.findFirstByUsername(employeeRow.getManager());
                     manager.ifPresent(employee::setManager);
 
+                    //if department with that name does not exist create a new department
                     Optional<Department> department = departmentRepository.findByName(employeeRow.getDepartment());
-                    department.ifPresent(employee::setDepartment);
+                    if (department.isEmpty()) {
+                        Department newDepartment = new Department();
+                        newDepartment.setName(employeeRow.getDepartment());
+                        employee.setDepartment(departmentRepository.save(newDepartment));
+                    } else
+                        employee.setDepartment(department.get());
 
                     employeeRepository.save(employee);
                 }
@@ -147,9 +165,6 @@ public class EmployeeService {
             System.out.println("Error: ");
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } finally {
-            if (file.exists())
-                file.delete();
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -171,10 +186,17 @@ public class EmployeeService {
         else
             employee.setStatus(Status.ACTIVE);
 
-        Address address = new Address();
-        address.setCity(excelRow.getAddress().split(",")[0]);
-        address.setNeighborhood(excelRow.getAddress().split(",")[1]);
-        employee.setAddress(addressRepository.save(address));
+        //if address with that name does not exist create a new address
+        String city = excelRow.getAddress().split(",")[0];
+        String neighborhood = excelRow.getAddress().split(",")[1];
+        Optional<Address> address = addressRepository.findByCityAndNeighborhood(city, neighborhood);
+        if (address.isEmpty()) {
+            Address newAddress = new Address();
+            newAddress.setCity(city);
+            newAddress.setNeighborhood(neighborhood);
+            employee.setAddress(addressRepository.save(newAddress));
+        } else
+            employee.setAddress(address.get());
 
         employeeRepository.save(employee);
     }
