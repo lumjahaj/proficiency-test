@@ -25,7 +25,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             " WHERE lower(e.firstName) LIKE %:search% " +
             " OR lower(e.lastName) LIKE %:search% " +
             " OR lower(e.username) LIKE %:search% " +
-            " OR lower(e.email) LIKE %:search% ")
+            " OR lower(e.email) LIKE %:search% " )
     List<ViewEmployeeDTO> findAllBySearch(@Param("search") String search);
 
     @Query("SELECT new com.elba.proficiencytest.dtos.ViewEmployeeDTO(e.firstName, e.lastName, e.username, e.email, " +
@@ -47,4 +47,15 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             " LEFT JOIN Employee m ON e.manager.id = m.id " +
             " WHERE e.status = 'INACTIVE' " )
     List<ViewEmployeeDTO> findAllByStatusIsInactive();
+
+    @Query("SELECT new com.elba.proficiencytest.dtos.ViewEmployeeDTO(e.firstName, e.lastName, e.username, e.email, " +
+            " e.phone, concat(a.city, ', ' , a.neighborhood ), e.startDate, e.endDate, e.status, " +
+            " m.username, d.name )" +
+            " FROM Employee e " +
+            " LEFT JOIN Address a ON e.address.id = a.id " +
+            " LEFT JOIN Department d ON e.department.id = d.id " +
+            " LEFT JOIN Employee m ON e.manager.id = m.id " +
+            " ORDER BY e.firstName ASC " )
+    List<ViewEmployeeDTO> findAllOrderByFirstNameAsc();
+
 }

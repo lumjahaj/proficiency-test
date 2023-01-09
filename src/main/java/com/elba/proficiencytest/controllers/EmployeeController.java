@@ -29,6 +29,11 @@ public class EmployeeController {
         return employeeService.getEmployeesByStatus();
     }
 
+    @GetMapping("/ascending")
+    public ResponseEntity<List<ViewEmployeeDTO>> getEmployeesInAscendingOrder() {
+        return employeeService.getEmployeesInAscendingOrder();
+    }
+
     @PostMapping("/upload")
     public ResponseEntity<?> uploadDataFromFile(@RequestParam("file") MultipartFile file) {
         return employeeService.uploadDataFromFile(file);
